@@ -26,7 +26,6 @@ import (
 	// "github.com/daryl/zeus"
 	cloudykitrouter "github.com/cloudykit/router"
 	"github.com/dimfeld/httptreemux"
-	"github.com/emicklei/go-restful"
 	"github.com/gin-gonic/gin"
 	"github.com/go-chi/chi"
 	"github.com/go-martini/martini"
@@ -34,8 +33,8 @@ import (
 	"github.com/gocraft/web"
 	"github.com/gorilla/mux"
 	gowwwrouter "github.com/gowww/router"
+	"github.com/juanjiTech/jin"
 	"github.com/julienschmidt/httprouter"
-	"github.com/labstack/echo/v4"
 	llog "github.com/lunny/log"
 	"github.com/lunny/tango"
 	vulcan "github.com/mailgun/route"
@@ -47,18 +46,19 @@ import (
 	_ "github.com/naoina/kocha-urlrouter/doublearray"
 	"github.com/pilu/traffic"
 	"github.com/plimble/ace"
-	"github.com/rcrowley/go-tigertonic"
-
 	// "github.com/revel/pathtree"
 	// "github.com/revel/revel"
 	"github.com/aerogo/aero"
+	goRestfulV3 "github.com/emicklei/go-restful/v3"
+	echoV4 "github.com/labstack/echo/v4"
+	goTigertonic "github.com/rcrowley/go-tigertonic"
 	"github.com/typepress/rivet"
 	"github.com/ursiform/bear"
 	"github.com/vanng822/r2router"
 	goji "github.com/zenazn/goji/web"
 	gojiv2 "goji.io"
 	gojiv2pat "goji.io/pat"
-	"gopkg.in/macaron.v1"
+	macaronV1 "gopkg.in/macaron.v1"
 )
 
 type route struct {
@@ -98,6 +98,7 @@ func init() {
 
 	initBeego()
 	initGin()
+	initJin()
 	initMartini()
 	// initRevel()
 	initTango()
@@ -477,27 +478,27 @@ func loadDencoSingle(method, path string, h denco.HandlerFunc) http.Handler {
 }
 
 // Echo
-func echoHandler(c echo.Context) error {
+func echoHandler(c echoV4.Context) error {
 	return nil
 }
 
-func echoHandlerWrite(c echo.Context) error {
+func echoHandlerWrite(c echoV4.Context) error {
 	io.WriteString(c.Response(), c.Param("name"))
 	return nil
 }
 
-func echoHandlerTest(c echo.Context) error {
+func echoHandlerTest(c echoV4.Context) error {
 	io.WriteString(c.Response(), c.Request().RequestURI)
 	return nil
 }
 
 func loadEcho(routes []route) http.Handler {
-	var h echo.HandlerFunc = echoHandler
+	var h echoV4.HandlerFunc = echoHandler
 	if loadTestHandler {
 		h = echoHandlerTest
 	}
 
-	e := echo.New()
+	e := echoV4.New()
 	for _, r := range routes {
 		switch r.method {
 		case "GET":
@@ -517,8 +518,8 @@ func loadEcho(routes []route) http.Handler {
 	return e
 }
 
-func loadEchoSingle(method, path string, h echo.HandlerFunc) http.Handler {
-	e := echo.New()
+func loadEchoSingle(method, path string, h echoV4.HandlerFunc) http.Handler {
+	e := echoV4.New()
 	switch method {
 	case "GET":
 		e.GET(path, h)
@@ -778,14 +779,14 @@ func loadGoJsonRestSingle(method, path string, hfunc rest.HandlerFunc) http.Hand
 	return api.MakeHandler()
 }
 
-// go-restful
-func goRestfulHandler(r *restful.Request, w *restful.Response) {}
+// go-goRestfulV3
+func goRestfulHandler(r *goRestfulV3.Request, w *goRestfulV3.Response) {}
 
-func goRestfulHandlerWrite(r *restful.Request, w *restful.Response) {
+func goRestfulHandlerWrite(r *goRestfulV3.Request, w *goRestfulV3.Response) {
 	io.WriteString(w, r.PathParameter("name"))
 }
 
-func goRestfulHandlerTest(r *restful.Request, w *restful.Response) {
+func goRestfulHandlerTest(r *goRestfulV3.Request, w *goRestfulV3.Response) {
 	io.WriteString(w, r.Request.RequestURI)
 }
 
@@ -797,8 +798,8 @@ func loadGoRestful(routes []route) http.Handler {
 
 	re := regexp.MustCompile(":([^/]*)")
 
-	wsContainer := restful.NewContainer()
-	ws := new(restful.WebService)
+	wsContainer := goRestfulV3.NewContainer()
+	ws := new(goRestfulV3.WebService)
 
 	for _, route := range routes {
 		path := re.ReplaceAllString(route.path, "{$1}")
@@ -822,9 +823,9 @@ func loadGoRestful(routes []route) http.Handler {
 	return wsContainer
 }
 
-func loadGoRestfulSingle(method, path string, handler restful.RouteFunction) http.Handler {
-	wsContainer := restful.NewContainer()
-	ws := new(restful.WebService)
+func loadGoRestfulSingle(method, path string, handler goRestfulV3.RouteFunction) http.Handler {
+	wsContainer := goRestfulV3.NewContainer()
+	ws := new(goRestfulV3.WebService)
 	switch method {
 	case "GET":
 		ws.Route(ws.GET(path).To(handler))
@@ -953,6 +954,40 @@ func loadHttpTreeMux(routes []route) http.Handler {
 func loadHttpTreeMuxSingle(method, path string, handler httptreemux.HandlerFunc) http.Handler {
 	router := httptreemux.New()
 	router.Handle(method, path, handler)
+	return router
+}
+
+// Jin
+func jinHandle(_ *jin.Context) {}
+
+func jinHandleWrite(c *jin.Context) {
+	io.WriteString(c.Writer, c.Params.ByName("name"))
+}
+
+func jinHandleTest(c *jin.Context) {
+	io.WriteString(c.Writer, c.Request.RequestURI)
+}
+
+func initJin() {
+	jin.SetMode(jin.ReleaseMode)
+}
+
+func loadJin(routes []route) http.Handler {
+	h := jinHandle
+	if loadTestHandler {
+		h = jinHandleTest
+	}
+
+	router := jin.New()
+	for _, route := range routes {
+		router.Handle(route.method, route.path, h)
+	}
+	return router
+}
+
+func loadJinSingle(method, path string, handle jin.HandlerFunc) http.Handler {
+	router := jin.New()
+	router.Handle(method, path, handle)
 	return router
 }
 
@@ -1104,21 +1139,21 @@ func loadLARSSingle(method, path string, h interface{}) http.Handler {
 // Macaron
 func macaronHandler() {}
 
-func macaronHandlerWrite(c *macaron.Context) string {
+func macaronHandlerWrite(c *macaronV1.Context) string {
 	return c.Params("name")
 }
 
-func macaronHandlerTest(c *macaron.Context) string {
+func macaronHandlerTest(c *macaronV1.Context) string {
 	return c.Req.RequestURI
 }
 
 func loadMacaron(routes []route) http.Handler {
-	var h = []macaron.Handler{macaronHandler}
+	var h = []macaronV1.Handler{macaronHandler}
 	if loadTestHandler {
 		h[0] = macaronHandlerTest
 	}
 
-	m := macaron.New()
+	m := macaronV1.New()
 	for _, route := range routes {
 		m.Handle(route.method, route.path, h)
 	}
@@ -1126,8 +1161,8 @@ func loadMacaron(routes []route) http.Handler {
 }
 
 func loadMacaronSingle(method, path string, handler interface{}) http.Handler {
-	m := macaron.New()
-	m.Handle(method, path, []macaron.Handler{handler})
+	m := macaronV1.New()
+	m.Handle(method, path, []macaronV1.Handler{handler})
 	return m
 }
 
@@ -1502,7 +1537,7 @@ func loadTigerTonic(routes []route) http.Handler {
 	}
 
 	re := regexp.MustCompile(":([^/]*)")
-	mux := tigertonic.NewTrieServeMux()
+	mux := goTigertonic.NewTrieServeMux()
 	for _, route := range routes {
 		mux.HandleFunc(route.method, re.ReplaceAllString(route.path, "{$1}"), h)
 	}
@@ -1510,7 +1545,7 @@ func loadTigerTonic(routes []route) http.Handler {
 }
 
 func loadTigerTonicSingle(method, path string, handler http.HandlerFunc) http.Handler {
-	mux := tigertonic.NewTrieServeMux()
+	mux := goTigertonic.NewTrieServeMux()
 	mux.HandleFunc(method, path, handler)
 	return mux
 }

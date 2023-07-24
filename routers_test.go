@@ -31,6 +31,7 @@ var (
 		{"GowwwRouter", loadGowwwRouter},
 		{"HttpRouter", loadHttpRouter},
 		{"HttpTreeMux", loadHttpTreeMux},
+		{"Jin", loadJin},
 		//{"Kocha", loadKocha},
 		{"LARS", loadLARS},
 		{"Macaron", loadMacaron},

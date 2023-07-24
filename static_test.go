@@ -191,6 +191,7 @@ var (
 	staticGowwwRouter     http.Handler
 	staticHttpRouter      http.Handler
 	staticHttpTreeMux     http.Handler
+	staticJin             http.Handler
 	staticKocha           http.Handler
 	staticLARS            http.Handler
 	staticMacaron         http.Handler
@@ -274,6 +275,9 @@ func init() {
 	})
 	calcMem("HttpTreeMux", func() {
 		staticHttpTreeMux = loadHttpTreeMux(staticRoutes)
+	})
+	calcMem("Jin", func() {
+		staticJin = loadJin(staticRoutes)
 	})
 	calcMem("Kocha", func() {
 		staticKocha = loadKocha(staticRoutes)
@@ -383,6 +387,9 @@ func BenchmarkHttpRouter_StaticAll(b *testing.B) {
 func BenchmarkHttpTreeMux_StaticAll(b *testing.B) {
 	benchRoutes(b, staticHttpRouter, staticRoutes)
 }
+func BenchmarkJin_StaticAll(b *testing.B) {
+	benchRoutes(b, staticJin, staticRoutes)
+}
 func BenchmarkKocha_StaticAll(b *testing.B) {
 	benchRoutes(b, staticKocha, staticRoutes)
 }
@@ -405,9 +412,9 @@ func BenchmarkR2router_StaticAll(b *testing.B) {
 	benchRoutes(b, staticR2router, staticRoutes)
 }
 
-// func BenchmarkRevel_StaticAll(b *testing.B) {
-// 	benchRoutes(b, staticRevel, staticRoutes)
-// }
+//	func BenchmarkRevel_StaticAll(b *testing.B) {
+//		benchRoutes(b, staticRevel, staticRoutes)
+//	}
 func BenchmarkRivet_StaticAll(b *testing.B) {
 	benchRoutes(b, staticRivet, staticRoutes)
 }

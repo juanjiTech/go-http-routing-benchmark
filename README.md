@@ -25,6 +25,7 @@ Of course the tested routers can be used for any kind of HTTP request → handle
  * [R2router](https://github.com/vanng822/r2router)
  * [TigerTonic](https://github.com/rcrowley/go-tigertonic)
  * [Traffic](https://github.com/pilu/traffic)
+ * [jin](https://github.com/juanjiTech/jin)
 
 
 ## Motivation

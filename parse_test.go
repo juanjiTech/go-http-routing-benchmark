@@ -75,6 +75,7 @@ var (
 	parseGowwwRouter     http.Handler
 	parseHttpRouter      http.Handler
 	parseHttpTreeMux     http.Handler
+	parseJin             http.Handler
 	parseKocha           http.Handler
 	parseLARS            http.Handler
 	parseMacaron         http.Handler
@@ -150,6 +151,9 @@ func init() {
 	})
 	calcMem("HttpTreeMux", func() {
 		parseHttpTreeMux = loadHttpTreeMux(parseAPI)
+	})
+	calcMem("Jin", func() {
+		parseJin = loadJin(parseAPI)
 	})
 	calcMem("Kocha", func() {
 		parseKocha = loadKocha(parseAPI)
@@ -274,6 +278,10 @@ func BenchmarkHttpTreeMux_ParseStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/users", nil)
 	benchRequest(b, parseHttpTreeMux, req)
 }
+func BenchmarkJin_ParseStatic(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/1/users", nil)
+	benchRequest(b, parseJin, req)
+}
 func BenchmarkKocha_ParseStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/users", nil)
 	benchRequest(b, parseKocha, req)
@@ -303,10 +311,10 @@ func BenchmarkR2router_ParseStatic(b *testing.B) {
 	benchRequest(b, parseR2router, req)
 }
 
-// func BenchmarkRevel_ParseStatic(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/1/users", nil)
-// 	benchRequest(b, parseRevel, req)
-// }
+//	func BenchmarkRevel_ParseStatic(b *testing.B) {
+//		req, _ := http.NewRequest("GET", "/1/users", nil)
+//		benchRequest(b, parseRevel, req)
+//	}
 func BenchmarkRivet_ParseStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/users", nil)
 	benchRequest(b, parseRivet, req)
@@ -439,10 +447,10 @@ func BenchmarkR2router_ParseParam(b *testing.B) {
 	benchRequest(b, parseR2router, req)
 }
 
-// func BenchmarkRevel_ParseParam(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/1/classes/go", nil)
-// 	benchRequest(b, parseRevel, req)
-// }
+//	func BenchmarkRevel_ParseParam(b *testing.B) {
+//		req, _ := http.NewRequest("GET", "/1/classes/go", nil)
+//		benchRequest(b, parseRevel, req)
+//	}
 func BenchmarkRivet_ParseParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go", nil)
 	benchRequest(b, parseRivet, req)
@@ -546,6 +554,10 @@ func BenchmarkHttpTreeMux_Parse2Params(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
 	benchRequest(b, parseHttpTreeMux, req)
 }
+func BenchmarkJin_Parse2Params(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
+	benchRequest(b, parseJin, req)
+}
 func BenchmarkKocha_Parse2Params(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
 	benchRequest(b, parseKocha, req)
@@ -575,10 +587,10 @@ func BenchmarkR2router_Parse2Params(b *testing.B) {
 	benchRequest(b, parseR2router, req)
 }
 
-// func BenchmarkRevel_Parse2Params(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
-// 	benchRequest(b, parseRevel, req)
-// }
+//	func BenchmarkRevel_Parse2Params(b *testing.B) {
+//		req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
+//		benchRequest(b, parseRevel, req)
+//	}
 func BenchmarkRivet_Parse2Params(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
 	benchRequest(b, parseRivet, req)
@@ -663,6 +675,9 @@ func BenchmarkHttpRouter_ParseAll(b *testing.B) {
 func BenchmarkHttpTreeMux_ParseAll(b *testing.B) {
 	benchRoutes(b, parseHttpTreeMux, parseAPI)
 }
+func BenchmarkJin_ParseAll(b *testing.B) {
+	benchRoutes(b, parseJin, parseAPI)
+}
 func BenchmarkKocha_ParseAll(b *testing.B) {
 	benchRoutes(b, parseKocha, parseAPI)
 }
@@ -685,9 +700,9 @@ func BenchmarkR2router_ParseAll(b *testing.B) {
 	benchRoutes(b, parseR2router, parseAPI)
 }
 
-// func BenchmarkRevel_ParseAll(b *testing.B) {
-// 	benchRoutes(b, parseRevel, parseAPI)
-// }
+//	func BenchmarkRevel_ParseAll(b *testing.B) {
+//		benchRoutes(b, parseRevel, parseAPI)
+//	}
 func BenchmarkRivet_ParseAll(b *testing.B) {
 	benchRoutes(b, parseRivet, parseAPI)
 }
